@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asa Home Bakery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> <!-- For icons -->
+    <style>
+        body { font-family: 'Georgia', serif; margin: 0; padding: 0; background-color: #fefefe; color: #333; line-height: 1.6; }
+        header { background: linear-gradient(to right, #d2b48c, #f5deb3); color: #5d4e37; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        nav { margin-top: 10px; }
+        nav a { color: #5d4e37; margin: 0 20px; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+        nav a:hover { color: #a0522d; }
+        .hero { background: url('https://i.imgur.com/4QYV4Z2.jpg') no-repeat center/cover; height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; position: relative; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); }
+        .hero h1 { font-size: 3em; z-index: 1; position: relative; }
+        .hero p { font-size: 1.2em; z-index: 1; position: relative; margin-top: 10px; }
+        .hero button { background: #deb887; color: #5d4e37; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.3s; }
+        .hero button:hover { background: #d2b48c; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .section { margin-bottom: 40px; }
+        .product-carousel { display: flex; overflow-x: auto; gap: 20px; padding: 10px; scroll-snap-type: x mandatory; }
+        .product { flex: 0 0 300px; text-align: center; border: 1px solid #eee; padding: 20px; border-radius: 12px; background: #fafafa; transition: transform 0.3s, box-shadow 0.3s; scroll-snap-align: start; }
+        .product:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .product img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+        .price { font-family: 'Arial', sans-serif; font-size: 22px; color: #a0522d; font-weight: bold; margin: 15px 0; }
+        .product button { background: #deb887; color: #5d4e37; padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; transition: background 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+        .product button:hover { background: #d2b48c; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .gallery img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; transition: opacity 0.3s; }
+        .gallery img:hover { opacity: 0.8; }
+        .testimonials { display: flex; flex-wrap: wrap; gap: 20px; }
+        .testimonial { flex: 1; min-width: 250px; padding: 20px; background: #f5deb3; border-radius: 8px; border-left: 5px solid #a0522d; }
+        .cart { position: fixed; top: 20px; right: 20px; background: #deb887; color: #5d4e37; padding: 10px 15px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; }
+        .cart-count { position: absolute; top: -5px; right: -5px; background: #a0522d; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; font-weight: bold; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #deb887; color: #5d4e37; padding: 10px 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.5s; z-index: 1000; }
+        .toast.show { opacity: 1; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80%; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { margin: 0; color: #5d4e37; }
+        .close { cursor: pointer; font-size: 24px; color: #a0522d; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; background: #f5deb3; border-radius: 8px; }
+        .cart-item .quantity { display: flex; align-items: center; gap: 10px; }
+        .cart-item button { background: #deb887; color: #5d4e37; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .cart-item button:hover { background: #d2b48c; }
+        .checkout { margin-top: 20px; text-align: center; }
+        .checkout button { background: #a0522d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+        .checkout button:hover { background: #8b4513; }
+        form { max-width: 600px; margin: 0 auto; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; transition: border-color 0.3s; }
+        input:focus, textarea:focus, select:focus { border-color: #a0522d; outline: none; }
+        button { background: linear-gradient(to right, #deb887, #d2b48c); color: #5d4e37; padding: 15px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; transition: background 0.3s; }
+        button:hover { background: linear-gradient(to right, #d2b48c, #f5deb3); }
+        footer { text-align: center; padding: 20px; background: #d2b48c; color: #5d4e37; margin-top: 40px; }
+        footer p { font-family: 'Arial', sans-serif; }
+        footer a { color: #a0522d; text-decoration: none; margin: 0 10px; }
+        @media (max-width: 768px) { .hero h1 { font-size: 2em; } .product-carousel { flex-direction: column; } .modal-content { width: 95%; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Asa Home Bakery</h1>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About Us</a>
+            <a href="#products">Products</a>
+            <a href="#gallery">Gallery</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <div class="hero" id="home">
+        <div>
+            <h1>Welcome to Asa Home Bakery</h1>
+            <p>We offer premium quality, home-baked treats at affordable prices. Each item is crafted with care, as if straight from a home kitchen. Pre-order now for fresh delivery!</p>
+            <button onclick="scrollToProducts()">View Products</button>
+        </div>
+    </div>
+
+    <div class="container" id="about">
+        <h2>About Us</h2>
+        <p>Asa Home Bakery is where the essence of home meets premium quality. We bake every item with love, using the finest ingredients to deliver an unforgettable experience.</p>
+    </div>
+
+    <div class="container" id="products">
+        <h2>Our Featured Products</h2>
+        <div class="product-carousel">
+            <div class="product">
+                <img src="https://i.imgur.com/4QYV4Z2.jpg" alt="Salted Brownie">
+                <h3>Salted Brownie</h3>
+                <p>Indulge in comfort with our Salted Brownies. Baked in small batches with love in our home kitchen, these treats are exceptionally fudgy with a satisfying, dense texture found only in authentic home baking. Finished with a sprinkle of sea salt for a balanced, addictive touch.</p>
+                <div class="price">IDR 35,000 - IDR 85,000</div>
+                <button onclick="addToCart('Salted Brownie')"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+            </div>
+            <div class="product">
+                <img src="https://i.imgur.com/KZGh0HU.jpg" alt="Chocolate Chip Cookie">
+                <h3>Chocolate Chip Cookie</h3>
+                <p>Classic homemade cookies packed with gooey chocolate chips. Perfect for snacking or gifting. Made fresh daily with premium ingredients.</p>
+                <div class="price">IDR 20,000 - IDR 50,000</div>
+                <button onclick="addToCart('Chocolate Chip Cookie')"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+            </div>
+            <!-- Add more products if needed -->
+        </div>
+
+        <h3>Place Your Order</h3>
+        <form id="orderForm">
+            <input type="text" id="name" placeholder="Your Name" required>
+            <input type="email" id="email" placeholder="Your Email" required>
+            <input type="tel" id="phone" placeholder="Your Phone Number" required>
+            <select id="product" required>
+                <option value="">Select Product</option>
+                <option value="Salted Brownie">Salted Brownie</option>
+                <option value="Chocolate Chip Cookie">Chocolate Chip Cookie</option>
+            </select>
+            <input type="number" id="quantity" placeholder="Quantity" min="1" required>
+            <textarea id="address" placeholder="Delivery Address" rows="3" required></textarea>
+            <textarea id="message" placeholder="Additional Notes (e.g., custom requests)" rows="2"></textarea>
+            <button type="submit">Submit Order</button>
+        </form>
+    </div>
+
+    <div class="container" id="gallery">
+        <h2>Our Gallery</h2>
+        <div class="gallery">
+            <img src="https://i.imgur.com/4QYV4Z2.jpg" alt="Brownie">
+            <img src="https://i.imgur.com/KZGh0HU.jpg" alt="Cookie">
+            <!-- Add more images -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Customer Testimonials</h2>
+        <div class="testimonials">
+            <div class="testimonial">
+                <p>"Their baked goods are extraordinary! They taste just like grandmother's recipes." - Lifia, Bogor</p>
+            </div>
+            <div class="testimonial">
+                <p>"Fresh and delightful every time. Highly recommend!" - Alya, Bogor</p>
+            </div>
+            <div class="testimonial">
+                <p>"Perfect for gifts and personal indulgence. Will order again!" - Nabilah, Bogor</p>
+            </div>
+            <div class="testimonial">
+                <p>"Exceptional quality and swift delivery. A must-try!" - Mahesa, Jakarta</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart" onclick="openCartModal()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Cart</h2>
+                <span class="close" onclick="closeCartModal()">&times;</span>
+            </div>
+            <div id="cartItems"></div>
+            <div class="checkout">
+                <button onclick="checkoutWhatsApp()">Checkout via WhatsApp</button>
+                <button onclick="checkoutInstagram(https://www.instagram.com/asahomebakery/)">Checkout via Instagram</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer id="contact">
+        <p>Contact Us: asahomebakery@gmail.com | Phone: +62 812-9453-6163</p>
+        <p>Follow Us: <a href="https://www.instagram.com/asahomebakery/"><i class="fab fa-instagram"></i></a> <a href="#"><i class="fab fa-facebook"></i></a></p>
+        <p>&copy; 2025 Asa Home Bakery. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        updateCartCount();
+
+        function addToCart(product) {
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showToast(`${product} added to cart!`);
+        }
+
+        function updateCartCount() {
+            document.getElementById('cartCount').textContent = cart.length;
+        }
+
+        function scrollToProducts() {
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openCartModal() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = 'flex';
+            renderCartItems();
+        }
+
+        function closeCartModal() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function renderCartItems() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            cartItemsDiv.innerHTML = '';
+            const itemCounts = {};
+            cart.forEach(item => {
+                itemCounts[item] = (itemCounts[item] || 0) + 1;
+            });
+            Object.keys(itemCounts).forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    <span>${item}</span>
+                    <div class="quantity">
+                        <button onclick="changeQuantity('${item}', -1)">-</button>
+                        <span id="qty-${item}">${itemCounts[item]}</span>
+                        <button onclick="change
